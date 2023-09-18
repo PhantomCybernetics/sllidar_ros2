@@ -13,9 +13,7 @@ RUN apt install -y wget
 WORKDIR /root/
 RUN wget https://github.com/joan2937/pigpio/archive/master.zip
 RUN unzip master.zip
-RUN cd pigpio-master
-RUN make
-RUn sudo make install
+RUN cd pigpio-master && make && sudo make install
 
 # select bash as default shell
 #SHELL ["/bin/bash", "-c"]
@@ -40,16 +38,15 @@ WORKDIR /ros2_ws
 RUN mkdir -p $ROS_WS/src
 
 # install everything needed
-# RUN git clone https://github.com/husarion/sllidar_ros2.git /ros2_ws/src/sllidar_ros2 -b main && \
-RUN --mount=type=bind,source=./sllidar_ros2,target=/ros2_ws/src/sllidar_ros2 \
+RUN git clone https://github.com/PhantomCybernetics/sllidar_ros2.git /ros2_ws/src/sllidar_ros2 -b serial_gpio && \
     . /opt/ros/$ROS_DISTRO/setup.sh && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install --from-paths src --ignore-src -y && \
     colcon build --symlink-install --event-handlers console_direct+
 
 # PY tests
-RUN apt-get install -y pip
-RUN pip install RPi.GPIO
+# RUN apt-get install -y pip
+# RUN pip install RPi.GPIO
 
 # select bash as default shell
 #iSHELL ["/bin/bash", "-c"]

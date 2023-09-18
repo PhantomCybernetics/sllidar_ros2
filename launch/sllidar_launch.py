@@ -9,10 +9,10 @@ from launch.actions import LogInfo
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-
 def generate_launch_description():
-    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-    serial_baudrate = LaunchConfiguration('serial_baudrate', default='115200') #for A1/A2 is 115200
+    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyAMA1')
+    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A1/A2 is 115200
+    pwm_pin = LaunchConfiguration('pwm_pin', default=-1)
     frame_id = LaunchConfiguration('frame_id', default='laser')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
@@ -29,7 +29,12 @@ def generate_launch_description():
             'serial_baudrate',
             default_value=serial_baudrate,
             description='Specifying usb port baudrate to connected lidar'),
-        
+
+        DeclareLaunchArgument(
+            'pwm_pin',
+            default_value=pwm_pin,
+            description='Specifying pwm pin to drive lidar'),
+
         DeclareLaunchArgument(
             'frame_id',
             default_value=frame_id,
@@ -54,10 +59,11 @@ def generate_launch_description():
             package='sllidar_ros2',
             executable='sllidar_node',
             name='sllidar_node',
-            parameters=[{'serial_port': serial_port, 
-                         'serial_baudrate': serial_baudrate, 
+            parameters=[{'serial_port': serial_port,
+                         'serial_baudrate': serial_baudrate,
+                         'pwm_pin': pwm_pin,
                          'frame_id': frame_id,
-                         'inverted': inverted, 
+                         'inverted': inverted,
                          'angle_compensate': angle_compensate,
                          'scan_mode': scan_mode}],
             output='screen'),

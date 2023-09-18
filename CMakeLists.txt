@@ -20,7 +20,7 @@ endif()
 
 set(SLLIDAR_SDK_PATH "./sdk/")
 
-FILE(GLOB SLLIDAR_SDK_SRC 
+FILE(GLOB SLLIDAR_SDK_SRC
   "${SLLIDAR_SDK_PATH}/src/arch/linux/*.cpp"
   "${SLLIDAR_SDK_PATH}/src/hal/*.cpp"
   "${SLLIDAR_SDK_PATH}/src/*.cpp"
@@ -45,11 +45,13 @@ include_directories(
 
 add_executable(sllidar_node	src/sllidar_node.cpp ${SLLIDAR_SDK_SRC})
 # target_link_libraries(sllidar_node ${ament_cmake_LIBRARIES})
+target_link_libraries(sllidar_node pigpio)
 ament_target_dependencies(sllidar_node
   rclcpp
   std_srvs
   sensor_msgs
 )
+
 
 add_executable(sllidar_client src/sllidar_client.cpp)
 ament_target_dependencies(sllidar_client

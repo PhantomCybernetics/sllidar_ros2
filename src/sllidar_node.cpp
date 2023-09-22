@@ -563,15 +563,21 @@ int main(int argc, char * argv[])
     }
 
     std::signal(SIGINT, ExitHandler);
+    int ret = 0;
+    try {
+        rclcpp::init(argc, argv);
+        auto sllidar_node = std::make_shared<SLlidarNode>();
 
-    rclcpp::init(argc, argv);
-    auto sllidar_node = std::make_shared<SLlidarNode>();
+        rclcpp::executors::SingleThreadedExecutor executor;
+        executor.add_node(sllidar_node);
+        ret = sllidar_node->work_loop(&executor);
 
-    rclcpp::executors::SingleThreadedExecutor executor;
-    executor.add_node(sllidar_node);
-    int ret = sllidar_node->work_loop(&executor);
+        sllidar_node.reset();	// calling destructor through shared_ptr
 
-    sllidar_node.reset();	// calling destructor through shared_ptr
+    } catch (...) {
+        std::cout << "Exception caught, cleaning up" << std::endl;
+    }
+
     std::cout << "Cleaninig up" << std::endl;
     gpioTerminate();
     rclcpp::shutdown();

@@ -172,6 +172,8 @@ class SLlidarNode : public rclcpp::Node
         if(!drv)
             return false;
 
+        drv->stop();
+
         RCLCPP_DEBUG(this->get_logger(),"Stop motor");
         drv->setMotorSpeed(0);
         return true;
@@ -195,7 +197,6 @@ class SLlidarNode : public rclcpp::Node
                 pwm_pin_on = true;
                 sleep(2); //wait a bit before reading the motor again
             }
-            return true;
         }
 
         if(!drv) {
@@ -551,8 +552,12 @@ void ExitHandler(int sig)
 
 int main(int argc, char * argv[])
 {
+    int cfg = gpioCfgGetInternals();
+    cfg |= PI_CFG_NOSIGHANDLER;  // (1<<10)
+    gpioCfgSetInternals(cfg);
     if (gpioInitialise() < 0) {
-        std::cout << "GPIO initialization failed" << std::endl;
+        std::cout << "GPIO initialization failed, aborting" << std::endl;
+        return 1;
     } else {
         std::cout << "GPIO init ok" << std::endl;
     }
